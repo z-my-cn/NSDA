@@ -1,7 +1,9 @@
+from typing import List
+
+import matplotlib as mpl
 import networkx as nx
 from networkx import Graph
-from typing import List
-import matplotlib as mpl
+
 
 def graph_info(G: Graph, label: str="name", index: bool=True):
     ''' Print graph information
