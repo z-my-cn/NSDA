@@ -3,3 +3,4 @@
 .RData
 .Ruserdata
 .history
+**/__pycache__/

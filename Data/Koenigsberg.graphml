@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+<!-- Created by igraph -->
+  <key id="g_name" for="graph" attr.name="name" attr.type="string"/>
+  <key id="v_name" for="node" attr.name="name" attr.type="string"/>
+  <key id="v_Euler_letter" for="node" attr.name="Euler_letter" attr.type="string"/>
+  <key id="e_Euler_letter" for="edge" attr.name="Euler_letter" attr.type="string"/>
+  <key id="e_name" for="edge" attr.name="name" attr.type="string"/>
+  <graph id="G" edgedefault="undirected">
+    <data key="g_name">The seven bidges of Koenigsberg</data>
+    <node id="n0">
+      <data key="v_name">Altstadt-Loebenicht</data>
+      <data key="v_Euler_letter">B</data>
+    </node>
+    <node id="n1">
+      <data key="v_name">Kneiphof</data>
+      <data key="v_Euler_letter">A</data>
+    </node>
+    <node id="n2">
+      <data key="v_name">Vorstadt-Haberberg</data>
+      <data key="v_Euler_letter">C</data>
+    </node>
+    <node id="n3">
+      <data key="v_name">Lomse</data>
+      <data key="v_Euler_letter">D</data>
+    </node>
+    <edge source="n0" target="n1">
+      <data key="e_Euler_letter">a</data>
+      <data key="e_name">Kraemer Bruecke</data>
+    </edge>
+    <edge source="n0" target="n1">
+      <data key="e_Euler_letter">b</data>
+      <data key="e_name">Schmiedebruecke</data>
+    </edge>
+    <edge source="n0" target="n3">
+      <data key="e_Euler_letter">f</data>
+      <data key="e_name">Holzbruecke</data>
+    </edge>
+    <edge source="n1" target="n3">
+      <data key="e_Euler_letter">e</data>
+      <data key="e_name">Honigbruecke</data>
+    </edge>
+    <edge source="n2" target="n3">
+      <data key="e_Euler_letter">g</data>
+      <data key="e_name">Hohe Bruecke</data>
+    </edge>
+    <edge source="n1" target="n2">
+      <data key="e_Euler_letter">c</data>
+      <data key="e_name">Gruene Bruecke</data>
+    </edge>
+    <edge source="n1" target="n2">
+      <data key="e_Euler_letter">d</data>
+      <data key="e_name">Koettelbruecke</data>
+    </edge>
+  </graph>
+</graphml>
