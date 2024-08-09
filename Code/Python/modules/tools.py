@@ -32,6 +32,9 @@ def graph_info(G: Graph, label: str="name", index: bool=True):
         print("multigraph", end=" ")
     print()
     
+    if G.number_of_nodes() == 0:
+        return
+    
     # print node information
     # print node attributes name
     node_attr = []
@@ -44,6 +47,9 @@ def graph_info(G: Graph, label: str="name", index: bool=True):
         break
     print()
     
+    if G.number_of_edges() == 0:
+        return
+    
     # print edge information
     # print edge attributes name
     print("Edge attributes:", end=" ")
@@ -52,6 +58,7 @@ def graph_info(G: Graph, label: str="name", index: bool=True):
             print(key, end=" ")
         break
     print()
+    
     # print edge list: node1 --/-> node2
     MAX_WIDTH_LINE = 80
     MAX_LINE = 6
@@ -70,7 +77,7 @@ def graph_info(G: Graph, label: str="name", index: bool=True):
     
 
     count = 0
-    max_count_len = len(str(G.number_of_edges()))
+    max_count_len = len(str(G.number_of_edges())) - 1
     # remain width for edge list
     remain_width = MAX_WIDTH_LINE
     remain_line = MAX_LINE
