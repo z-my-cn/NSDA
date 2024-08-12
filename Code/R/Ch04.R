@@ -40,3 +40,52 @@ c(min(d), max(d))
 
 # 绘制度分布直方图
 hist(d, xlab = "度", ylab = "频数", main = "")
+
+## 双对数度分布图 --------------------------------------------------------------
+
+# 设置画布
+par(mfrow = c(1, 2))
+# 读取边数据
+edge_core <- read.csv('./Data/edge_core.csv')
+# 由边数据构造无向网络
+g <- graph_from_data_frame(edge_core, directed = FALSE)
+
+# 绘制度分布直方图
+hist(degree(g), xlab = "度", ylab = "频数", main = " ")
+
+# 绘制双对数度分布图
+# 计数
+data_freq <- data.frame(table(degree(g)))
+data_freq$Var1 <- as.numeric(as.character(data_freq$Var1))
+# 绘图
+plot(
+    log(as.numeric(data_freq$Var1)), log(data_freq$Freq),
+    xlab = "对数-度", ylab = "对数-作者数"
+)
+
+## 二元结构 --------------------------------------------------------------------
+
+# 导入数据
+data("UKfaculty")
+# 利用dyad.census()函数计算三种二元结构的数量
+# dyad.census(UKfaculty)
+dyad_census(UKfaculty)
+
+# 利用邻接矩阵计算三种二元结构的数量
+# 获得邻接矩阵
+A <- as_adjacency_matrix(UKfaculty)
+# 将"dgCMatrix"类型转化为"matrix"类型
+A <- as.matrix(A)
+
+# 对称的节点对
+sum(diag(A%*%A))/2
+
+# 非对称的节点对
+sum(diag(A%*%t(A))) - sum(diag(A %*% A))
+
+# 空节点对
+n <- length(V(UKfaculty))
+(n*(n-1))/2 - sum(diag(A %*% t(A))) + sum(diag(A %*% A))/2
+
+## 三角形 ----------------------------------------------------------------------
+
