@@ -89,3 +89,87 @@ n <- length(V(UKfaculty))
 
 ## 三角形 ----------------------------------------------------------------------
 
+# 导入数据
+kite <- make_graph("Krackhardt_kite")
+# 展示三角形结构，每一列为三角形的三个顶点
+matrix(triangles(kite), nrow = 3)
+
+# 每个节点是多少个三角形结构的顶点
+count_triangles(kite)
+
+
+# 设置随机种子
+set.seed(42)
+# 随机生成一个有向网络
+g_sample <- sample_gnm(15, 45, directed = T)
+# 网络当中的各种三元结构数量
+# triad.census(g_sample)
+triad_census(g_sample)
+
+
+## 星形图、环形图、线图 --------------------------------------------------------
+
+# 设置画布
+par(mfrow = c(1, 3))
+# 创建星状网络
+g_1 <- make_star(7, mode = "undirected")
+# 绘图
+plot(
+    g_1,
+    layout = layout.star,
+    vertex.label.cex = 4,
+    vertex.label.color = 'black',
+    vertex.label.dist  = 2
+)
+
+# 创建环形网络
+g_2 <- make_ring(7)
+# 绘图
+plot(
+    g_2,
+    layout = layout.circle,
+    vertex.label.cex = 4,
+    vertex.label.color = 'black',
+    vertex.label.dist  = 2
+)
+
+# 创建线形网络
+g_3 <- make_lattice(7)
+# 绘图
+plot(
+    g_3,
+    vertex.label.cex = 4,
+    vertex.label.color = 'black',
+    vertex.label.dist  = 2
+)
+
+## 星形图、环形图、线图的距离和直径 --------------------------------------------
+
+# 星形图的节点距离、网络直径
+distances(g_1)
+
+diameter(g_1)
+
+# 环形图的节点距离、网络直径
+distances(g_2)
+
+diameter(g_2)
+
+# 线形图的节点距离、网络直径
+distances(g_3)
+
+diameter(g_3)
+
+## 星形图、环形图、线图的度中心性 ----------------------------------------------
+
+# 星形图
+degree(g_1, normalized = T)
+
+# 环形图
+degree(g_2, normalized = T)
+
+# 线形图
+degree(g_3, normalized = T)
+
+
+
