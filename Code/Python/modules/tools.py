@@ -79,7 +79,7 @@ def graph_info(G: Graph, label: str="name", index: bool=True):
     
 
     count = 0
-    max_count_len = len(str(G.number_of_edges() - 1))
+    max_count_len = min(len(str(G.number_of_edges() - 1)), 2)
     # remain width for edge list
     remain_width = MAX_WIDTH_LINE
     remain_line = MAX_LINE
