@@ -387,4 +387,4 @@ author <- read.csv("./Data/author.csv")
 betweenness_top10 <- left_join(betweenness[1:10, ], author)
 
 # 展示
-head(betweenness_top10[ , c(1:3)], 10)
+head(betweenness_top10[, c(1:3)], 10)
