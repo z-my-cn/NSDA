@@ -329,7 +329,7 @@ print(paste0('网络的边数为：', ecount(g)))
 # print(paste0('网络的密度为：', graph.density(g)))
 print(paste0('网络的密度为：', edge_density(g)))
 
-绘制度分布直方图
+# 绘制度分布直方图
 hist(
     degree(g),
     ylab = "频数", xlab = "度",
