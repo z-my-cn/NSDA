@@ -3,18 +3,17 @@ from typing import List
 import matplotlib as mpl
 import networkx as nx
 from networkx import Graph
+import numpy as np
 
 
 def graph_info(G: Graph, label: str="name", index: bool=True):
-    ''' Print graph information
-    Parameters:
-    G: graph
-    label: node attribute name to be used as node label
-    index: whether to print edge index
-    
-    Return:
-    None
-    '''
+    """Print graph information
+
+    Args:
+        G (Graph): graph
+        label (str, optional): node attribute name to be used as node label. Defaults to "name".
+        index (bool, optional): whether to print edge index. Defaults to True.
+    """
     # print graph information
     if G.name:
         print(G.name, end=" ")
@@ -109,16 +108,19 @@ def graph_info(G: Graph, label: str="name", index: bool=True):
 
 
 def map_color(G: Graph, groupby: str="color", cmap: str="tab10") -> List:
-    ''' Map color to node
-    Parameters:
-    G: graph
-    groupby: node attribute name to be used as groupby
-    cmap: color map name
+    """Map color to node
     
-    Return:
-    List of color
-    '''
-        
+    Args:
+        G (Graph): graph
+        groupby (str, optional): node attribute name to be used as groupby. Defaults to "color".
+        cmap (str, optional): color map name. Defaults to "tab10", but will be changed to "tab20" if group number is greater than 10.
+
+    Raises:
+        ValueError: Node does not have attribute {groupby}
+
+    Returns:
+        List: list of color
+    """
     # get group list
     group_list = []
     for node in G.nodes(data=True):
@@ -126,6 +128,11 @@ def map_color(G: Graph, groupby: str="color", cmap: str="tab10") -> List:
             raise ValueError(f"Node {node[0]} does not have attribute {groupby}")
         if node[1][groupby] not in group_list:
             group_list.append(node[1][groupby])
+            
+    # set color map
+    if len(group_list) > 10:
+        cmap = "tab20"
+        
     # get color list
     cmap = mpl.colormaps.get_cmap(cmap)
     color_list = [cmap(i) for i in range(len(group_list))]
@@ -134,3 +141,63 @@ def map_color(G: Graph, groupby: str="color", cmap: str="tab10") -> List:
     for i in range(len(group_list)):
         color_map[group_list[i]] = color_list[i]
     return [color_map[node[1][groupby]] for node in G.nodes(data=True)]
+
+
+def count_kstar(g: Graph, k: int) -> int:
+    """Count the number of k-star in a graph
+
+    Args:
+        g (Graph): graph
+        k (int): k-star
+
+    Raises:
+        ValueError: k should be greater than 1
+
+    Returns:
+        int: number of k-star
+    """
+    if k < 2:
+        raise ValueError("k should be greater than 1")
+    
+    g_copy = g.copy()
+    # remove self-loop
+    g_copy.remove_edges_from(nx.selfloop_edges(g_copy))
+    nkstar = 0
+    # get the nodes with degree greater than k-1
+    c_nodes = [node for node, degree in g_copy.degree() if degree > k - 1]
+    # count the number of k-star
+    for c in c_nodes:
+        n = len(list(g_copy.neighbors(c)))
+        # count the number of k-star with center node c and n neighbors
+        # based on the formula: C(n, k-1)
+        nkstar += np.math.factorial(n) / (np.math.factorial(k) * np.math.factorial(n - k))
+    
+    return int(nkstar)
+
+
+def count_triangle(g: Graph) -> int:
+    """Count the number of triangle in a graph
+
+    Args:
+        g (Graph): undirected graph
+        
+    Raises:
+        ValueError: For directed graph, use nx.triadic_census instead
+        
+    Returns:
+        int: number of triangle
+    """
+    if nx.is_directed(g):
+        # tip: use nx.triadic_census
+        raise ValueError("For directed graph, use nx.triadic_census instead")
+    g_copy = g.copy()
+    # remove self-loop
+    g_copy.remove_edges_from(nx.selfloop_edges(g_copy))
+    triangles = set()
+    for node1 in g_copy.nodes():
+        for node2 in g_copy.neighbors(node1):
+            for node3 in g_copy.neighbors(node2):
+                if node3 in g_copy.neighbors(node1):
+                    triangles.add(tuple(sorted([node1, node2, node3])))
+                    
+    return len(triangles)
