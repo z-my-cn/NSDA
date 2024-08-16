@@ -9,10 +9,19 @@ import numpy as np
 def graph_info(G: Graph, label: str="name", index: bool=True):
     """Print graph information with node, edge and their attributes
 
-    Args:
-        G (Graph): graph
-        label (str, optional): node attribute name to be used as node label. Defaults to "name".
-        index (bool, optional): whether to print edge index. Defaults to True.
+    Parameters
+    ----------
+    G : Graph
+        A NetworkX graph
+    label : str, optional
+        Node attribute name to be used as node label, by default "name"
+    index : bool, optional
+        Whether to print edge index, by default True
+        
+    Raises
+    ------
+    ValueError
+        Node does not have attribute {label}
     """
     # print graph information
     if G.name:
@@ -110,16 +119,24 @@ def graph_info(G: Graph, label: str="name", index: bool=True):
 def map_color(G: Graph, groupby: str="color", cmap: str="tab10") -> List:
     """Map color to node
     
-    Args:
-        G (Graph): graph
-        groupby (str, optional): node attribute name to be used as groupby. Defaults to "color".
-        cmap (str, optional): color map name. Defaults to "tab10", but will be changed to "tab20" if group number is greater than 10.
-
-    Raises:
-        ValueError: Node does not have attribute {groupby}
-
-    Returns:
-        List: list of color
+    Parameters
+    ----------
+    G : Graph
+        A NetworkX graph
+    groupby : str, optional
+        Node attribute name to be used as groupby, by default "color"
+    cmap : str, optional
+        Color map name, by default "tab10", but will be changed to "tab20" if group number is greater than 10
+        
+    Raises
+    ------
+    ValueError
+        Node does not have attribute {groupby}
+        
+    Returns
+    -------
+    List
+        List of color
     """
     # get group list
     group_list = []
@@ -145,19 +162,26 @@ def map_color(G: Graph, groupby: str="color", cmap: str="tab10") -> List:
 
 def count_kstar(g: Graph, k: int) -> int:
     """Count the number of k-star in a graph
-
-    Args:
-        g (Graph): graph
-        k (int): k-star
-
-    Raises:
-        ValueError: k should be greater than 1
-
-    Returns:
-        int: number of k-star
+    
+    Parameters
+    ----------
+    g : Graph
+        A NetworkX graph
+    k : int
+        k-star's k value
+        
+    Raises
+    ------
+    ValueError
+        If k is less than 2
+        
+    Returns
+    -------
+    int
+        Number of k-star
     """
     if k < 2:
-        raise ValueError("k should be greater than 1")
+        raise ValueError("k is less than 2")
     
     g_copy = g.copy()
     # remove self-loop
@@ -178,14 +202,20 @@ def count_kstar(g: Graph, k: int) -> int:
 def count_triangle(g: Graph) -> int:
     """Count the number of triangle in a graph
 
-    Args:
-        g (Graph): undirected graph
+    Parameters
+    ----------
+    g : Graph
+        A NetworkX graph (undirected)
         
-    Raises:
-        ValueError: For directed graph, use nx.triadic_census instead
+    Raises
+    ------
+    ValueError
+        For directed graph, use nx.triadic_census instead
         
-    Returns:
-        int: number of triangle
+    Returns
+    -------
+    int
+        Number of triangle
     """
     if nx.is_directed(g):
         # tip: use nx.triadic_census
