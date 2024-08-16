@@ -1,5 +1,7 @@
 # NSDA
 
+Network Structure Data Analysis and Application
+
 ## 简介
 
 本仓库是对《网络结构数据分析与应用》（潘蕊、张妍和高天辰 著）一书中的代码的学习和实现。
