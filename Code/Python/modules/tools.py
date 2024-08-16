@@ -7,7 +7,7 @@ import numpy as np
 
 
 def graph_info(G: Graph, label: str="name", index: bool=True):
-    """Print graph information
+    """Print graph information with node, edge and their attributes
 
     Args:
         G (Graph): graph
