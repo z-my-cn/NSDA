@@ -126,7 +126,7 @@ def map_color(G: Graph, groupby: str="color", cmap: str="tab10") -> List:
     groupby : str, optional
         Node attribute name to be used as groupby, by default "color"
     cmap : str, optional
-        Color map name, by default "tab10", but will be changed to "tab20" if group number is greater than 10
+        Color map name, by default "tab10"
         
     Raises
     ------
@@ -145,10 +145,6 @@ def map_color(G: Graph, groupby: str="color", cmap: str="tab10") -> List:
             raise ValueError(f"Node {node[0]} does not have attribute {groupby}")
         if node[1][groupby] not in group_list:
             group_list.append(node[1][groupby])
-            
-    # set color map
-    if len(group_list) > 10:
-        cmap = "tab20"
         
     # get color list
     cmap = mpl.colormaps.get_cmap(cmap)
@@ -158,6 +154,48 @@ def map_color(G: Graph, groupby: str="color", cmap: str="tab10") -> List:
     for i in range(len(group_list)):
         color_map[group_list[i]] = color_list[i]
     return [color_map[node[1][groupby]] for node in G.nodes(data=True)]
+
+
+def map_shape(G: Graph, groupby: str="shape") -> List:
+    """Map shape to node
+    
+    Warning: nx.draw_networkx_nodes only supports str type for node_shape, this function is not available
+    
+    Parameters
+    ----------
+    G : Graph
+        A NetworkX graph
+    groupby : str, optional
+        Node attribute name to be used as groupby, by default "shape"
+        
+    Raises
+    ------
+    ValueError
+        Node does not have attribute {groupby} or number of group is greater than number of shape
+    
+    Returns
+    -------
+    List
+        List of shape
+    """
+    # get group list
+    group_list = []
+    for node in G.nodes(data=True):
+        if groupby not in node[1]:
+            raise ValueError(f"Node {node[0]} does not have attribute {groupby}")
+        if node[1][groupby] not in group_list:
+            group_list.append(node[1][groupby])
+    # set shape list
+    shape_list = ["o", "s", "d", "^", "v", "<", ">", "p", "h", "8"]
+    
+    if len(group_list) > len(shape_list):
+        raise ValueError(f"Number of group is greater than number of shape ({len(group_list)} > {len(shape_list)})")
+    
+    # map shape to group
+    shape_map = {}
+    for i in range(len(group_list)):
+        shape_map[group_list[i]] = shape_list[i % len(shape_list)]
+    return [shape_map[node[1][groupby]] for node in G.nodes(data=True)]
 
 
 def count_kstar(g: Graph, k: int) -> int:
@@ -231,3 +269,33 @@ def count_triangle(g: Graph) -> int:
                     triangles.add(tuple(sorted([node1, node2, node3])))
                     
     return len(triangles)
+
+
+def cluster_layout(G: Graph, communities: List, scale: int=15, seed: int=42) -> dict:
+    """Generate layout for a graph with communities
+    
+    Reference: https://networkx.org/documentation/stable/auto_examples/drawing/plot_clusters.html
+    
+    Parameters
+    ----------
+    G : Graph
+        A NetworkX graph
+    communities : List
+        List of communities, each community is a list of nodes
+    scale : int, optional
+        Scale factor for positions, by default 15
+    seed : int, optional
+        Random seed for layout, by default 42
+        
+    Returns
+    -------
+    Dict
+        A dictionary of node positions
+    """
+    supergraph = nx.cycle_graph(len(communities))
+    superpos = nx.spring_layout(G, scale=scale, seed=seed)
+    centers = list(superpos.values())
+    pos = {}
+    for center, com in zip(centers, communities):
+        pos.update(nx.spring_layout(nx.subgraph(G, com), center=center, seed=seed))
+    return pos
