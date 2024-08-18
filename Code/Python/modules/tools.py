@@ -1,9 +1,11 @@
-from typing import List
+from typing import List, Tuple, Any
 
 import matplotlib as mpl
+import matplotlib.pyplot as plt
 import networkx as nx
 from networkx import Graph
 import numpy as np
+from scipy.cluster.hierarchy import dendrogram
 
 
 def graph_info(G: Graph, label: str="name", index: bool=True):
@@ -299,3 +301,119 @@ def cluster_layout(G: Graph, communities: List, scale: int=15, seed: int=42) -> 
     for center, com in zip(centers, communities):
         pos.update(nx.spring_layout(nx.subgraph(G, com), center=center, seed=seed))
     return pos
+
+
+def create_linkage_matrix(cluster_result: List[Tuple[set, ...]]) -> Tuple[np.ndarray, dict[int, Any]]:
+    """Create linkage matrix from cluster result
+    
+    Parameters
+    ----------
+    cluster_result : List[Tuple[set, ...]]
+        A list of cluster result, each element is a tuple of sets
+
+    Returns
+    -------
+    Tuple[np.ndarray, dict]
+        np.ndarray: 2D array
+            A linkage matrix
+        dict
+            A dictionary of all samples and their index, {index: sample}
+    """
+    # Get all samples
+    all_samples = set()
+    for cluster in cluster_result[-1]:
+        all_samples.update(cluster)
+    all_samples = sorted(all_samples)
+    
+    # If the first-level result is not a single cluster, add it to the cluster result
+    if len(cluster_result[0]) != 1:
+        cluster_result = [(all_samples, )] + cluster_result
+    
+    # Initialize the current clusters
+    current_clusters = {}
+    for idx, sample in enumerate(all_samples):
+        current_clusters[frozenset([sample])] = idx
+    # Initialize the linkage matrix
+    linkage_matrix = []
+    # Initialize the cluster id for the next cluster
+    cluster_id = len(all_samples)
+
+    # Initialize the distance, which is the number of merges
+    distance = 0
+    # Traverse the cluster result from the last step to the first step
+    for step in range(len(cluster_result) - 2, -1, -1):
+        # Get the clusters in the next step
+        next_clusters = cluster_result[step]
+        
+        # Initialize
+        new_cluster_map = {}
+        used_clusters = set()
+
+        # Check each cluster in the next step
+        for cluster in next_clusters:
+            # Find the included clusters in the current step
+            included_clusters = []
+            for subcluster in cluster_result[step + 1]:
+                if frozenset(subcluster).issubset(cluster):
+                    included_clusters.append(current_clusters[frozenset(subcluster)])
+
+            # If there are more than one included clusters, merge them
+            if len(included_clusters) > 1:
+                # Get the two smallest indices
+                idx1, idx2 = sorted(included_clusters)[:2]
+                new_cluster_map[frozenset(cluster)] = cluster_id
+                linkage_matrix.append([idx1, idx2, distance + 1, len(cluster)])
+                distance += 1
+                cluster_id += 1
+                used_clusters.update(included_clusters)
+            else:
+                # if there is only one included cluster, use it directly
+                original_idx = current_clusters[frozenset(cluster)]
+                new_cluster_map[frozenset(cluster)] = original_idx
+
+        current_clusters = new_cluster_map
+
+    # Ensure that all clusters are used
+    linkage_matrix.sort(key=lambda x: x[2])
+    
+    all_samples_idx = {}
+    # Get the index of all samples
+    for idx, sample in enumerate(all_samples):
+        all_samples_idx[idx] = sample
+    
+    return np.array(linkage_matrix, dtype=float), all_samples_idx
+
+
+def plot_dendrogram(cluster_result: List[Tuple[set, ...]], labels: dict=None, color_cut: int=1, ax=None, **kwargs) -> None:
+    """Plot dendrogram from cluster result
+    
+    Parameters
+    ----------
+    cluster_result : List[Tuple[set, ...]]
+        A list of cluster result, each element is a tuple of sets
+    labels : dict
+        A dictionary of all samples and their label, by default None
+    color_cut : int
+        Color cut for dendrogram, means the number of clusters, by default 1
+    ax : Axes, optional
+        Axes object, by default None
+    **kwargs
+        Other keyword arguments for dendrogram
+    """
+    linkage_matrix, all_samples_idx = create_linkage_matrix(cluster_result)
+    labels_list = None
+    if labels:
+        labels_list = []
+        # 按照idx的顺序获取label
+        for idx in range(len(all_samples_idx)):
+            sample = all_samples_idx[idx]
+            labels_list.append(labels[sample])
+    
+    color_threshold = linkage_matrix.shape[0] + 2 - color_cut
+    
+    dendrogram(
+        linkage_matrix, 
+        color_threshold=color_threshold,
+        labels=labels_list, 
+        ax=ax, **kwargs
+    )
